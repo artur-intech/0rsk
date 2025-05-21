@@ -9,4 +9,5 @@ node_modules/
 rdoc/
 target/
 vendor/
+config.yml
 sinatra.log
