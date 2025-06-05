@@ -34,9 +34,9 @@ Minitest::Reporters.use! [Minitest::Reporters::SpecReporter.new]
 require 'loog'
 require 'pgtk/pool'
 require 'yaml'
-require 'raven'
+require 'sentry-ruby'
 
-Raven.configure do |config|
+Sentry.init do |config|
   config.logger.level = Logger::WARN
 end
 
