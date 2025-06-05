@@ -10,16 +10,16 @@ before '/*' do
     login_link: settings.glogin.login_uri,
     request_ip: request.ip
   }
-  response.set_cookie('glogin', params[:glogin]) if params[:glogin]
-  if request.cookies['glogin']
+  cookies[:glogin] = params[:glogin] if params[:glogin]
+  if cookies[:glogin]
     begin
       @locals[:user] = GLogin::Cookie::Closed.new(
-        request.cookies['glogin'],
+        cookies[:glogin],
         settings.config['github']['encryption_secret'],
         context
       ).to_user
     rescue GLogin::Codec::DecodingError
-      response.delete_cookie('glogin')
+      cookies.delete(:glogin)
     end
   end
   @locals[:tasks_count] = tasks.count if @locals[:user]
@@ -28,15 +28,15 @@ end
 get '/github-callback' do
   code = params[:code]
   error(400) if code.nil?
-  response.set_cookie(:glogin, GLogin::Cookie::Open.new(
+  cookies[:glogin] = GLogin::Cookie::Open.new(
     settings.glogin.user(code),
     settings.config['github']['encryption_secret'],
     context
-  ).to_s)
+  ).to_s
   flash('/', 'You have been logged in')
 end
 
 get '/logout' do
-  response.delete_cookie('glogin')
+  cookies.delete(:glogin)
   flash('/', 'You have been logged out')
 end

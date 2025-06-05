@@ -16,6 +16,7 @@ require 'pgtk/pool'
 require 'sentry-ruby'
 require 'relative_time'
 require 'sinatra'
+require 'sinatra/cookies'
 require 'telebot'
 require 'time'
 require 'yaml'
@@ -109,7 +110,7 @@ end
 
 get '/projects/select' do
   pid = params[:id]
-  response.set_cookie('0rsk-project', pid)
+  cookies['0rsk-project'] = pid
   flash('/ranked', "Project ##{pid} selected")
 end
 
@@ -230,10 +231,10 @@ def current_user
 end
 
 def current_project
-  pid = request.cookies['0rsk-project']
+  pid = cookies['0rsk-project']
   flash('/projects', 'Pick up a project to work with, or create a new one') unless pid
   unless projects.exists?(pid)
-    response.delete_cookie('0rsk-project')
+    cookies.delete('0rsk-project')
     flash('/projects', 'Pick up a new project')
   end
   pid
